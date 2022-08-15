@@ -19,7 +19,7 @@ jobs:
         if: github.event.action == 'Formula Workflow Response'
         run: |
           echo "RESPONSE received from '${{ github.event.client_payload.repository }}'"
-          curl -X POST https://api.github.com/repos/GuillaumeFalourd/ritchie-formulas-scheduler-demo/dispatches \
+          curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           --data '{"event_type": "Unexpected Event Demo", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
