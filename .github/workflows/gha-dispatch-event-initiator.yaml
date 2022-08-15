@@ -8,18 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: INIT WORKFLOW - Dispatch init event to REMOTE repository
+      - name: Dispatch init event
         if: github.event.action != 'Formula Workflow Response'
         run: |
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
-          --data '{"event_type": "Start Formula Workflow", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
-      - name: FORMULA RESPONSE - Response event from REMOTE repository
-        if: github.event.action == 'Formula Workflow Response'
-        run: |
-          echo "RESPONSE received from '${{ github.event.client_payload.repository }}'"
-          curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
-          -H 'Accept: application/vnd.github.everest-preview+json' \
-          -u ${{ secrets.ACCESS_TOKEN }} \
-          --data '{"event_type": "Unexpected Event Demo", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
+          --data '{"event_type": "release", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "ref": "${{ github.ref }}", "sha": "${{ github.sha }}" }}'
