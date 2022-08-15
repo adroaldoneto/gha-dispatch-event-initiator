@@ -1,8 +1,7 @@
 on:
   push:
     branches:
-     - test
-  repository_dispatch:
+     - release-*
   
 jobs:
   build:
