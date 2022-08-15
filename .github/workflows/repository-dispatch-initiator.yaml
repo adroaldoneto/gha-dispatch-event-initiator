@@ -1,16 +1,16 @@
-on:
-  push:
-    branches:
-     - main
-      
-jobs:
-  event:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          token: ${{ secrets.ACCESS_TOKEN }}
+on:  
+  push:  
+    branches:  
+      - main  
+  
+jobs:  
+  notify-parent-repo:  
+    runs-on: ubuntu-latest  
+    steps:  
+      - name: Repository Dispatch  
+        uses: peter-evans/repository-dispatch@v2  
+        with:  
+          token: ${{ secrets.ACCESS_TOKEN }}  
           repository: adroaldoneto/gha-dispatch-event
           event-type: Start Formula Workflow
-          client-payload: '{ "repository": "'"$GITHUB_REPOSITORY"'" }'
+
