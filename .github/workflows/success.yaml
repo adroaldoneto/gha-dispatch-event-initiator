@@ -1,3 +1,0 @@
-on:
-  repository_dispatch:
-    types: [success]
