@@ -17,7 +17,7 @@ jobs:
           -u ${{ secrets.ACCESS_TOKEN }} \
           --data '{"event_type": "release", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "ref_name": "${{ github.ref_name }}" }}'
           
-          Sleep 1m
+          sleep 1m
       - name: Success
         if: github.event.action == 'success'
         run: |
