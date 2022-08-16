@@ -12,7 +12,7 @@ jobs:
       - name: Dispatch init event
         if: github.event.action != 'success'
         run: |
-          JOB_ID=echo $RANDOM | md5sum | head -c 10; echo;
+          JOB_ID=$(echo $RANDOM | md5sum | head -c 10);
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
