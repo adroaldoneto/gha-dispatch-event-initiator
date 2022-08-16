@@ -12,13 +12,9 @@ jobs:
       - name: Dispatch init event
         if: github.event.action != 'success'
         run: |
+          JOB_ID=echo $RANDOM | md5sum | head -c 10; echo;
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
-          --data '{"event_type": "release", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "ref_name": "${{ github.ref_name }}" }}'
+          --data '{"event_type": "release", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "ref_name": "${{ github.ref_name }}", "job_id": "$JOB_ID" }}'
           
-          sleep 1m
-      - name: Success
-        if: github.event.action == 'success'
-        run: |
-          echo "Validação efetuada com sucesso"
