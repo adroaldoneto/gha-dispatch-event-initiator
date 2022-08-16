@@ -1,4 +1,6 @@
 on:
+  repository_dispatch:
+    types: [success]
   pull_request:
     branches:
      - release-*
@@ -8,9 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Dispatch init event
-        if: github.event.action != 'release'
+        if: github.event.action != 'success'
         run: |
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           --data '{"event_type": "release", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "ref_name": "${{ github.ref_name }}" }}'
+          
+          Sleep 1m
+      - name: Success
+        if: github.event.action == 'success'
+        run: |
+          echo "Validação efetuada com sucesso"
