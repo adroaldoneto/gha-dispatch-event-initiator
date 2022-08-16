@@ -18,7 +18,3 @@ jobs:
           -u ${{ secrets.ACCESS_TOKEN }} \
           --data '{"event_type": "release", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "ref_name": "${{ github.ref_name }}", "job_id": "$JOB_ID" }}'
           
-      - name: Success
-        if: github.event.action == 'success'
-        run: |
-          echo "Validação efetuada com sucesso"
