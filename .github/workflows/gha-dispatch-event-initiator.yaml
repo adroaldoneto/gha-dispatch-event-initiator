@@ -1,3 +1,5 @@
+name: Dispatch Event
+
 on:
   repository_dispatch:
     types: [success]
@@ -11,10 +13,40 @@ jobs:
     steps:
       - name: Dispatch init event
         if: github.event.action != 'success'
+        id: build
         run: |
           JOB_ID=$(echo $RANDOM | md5sum | head -c 10);
+          echo "::set-output name=job_id::$JOB_ID" 
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           --data '{"event_type": "release", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "ref_name": "${{ github.ref_name }}", "job_id": "'"$JOB_ID"'" }}'
-          
+
+  VERIFY_IF_COMPLETED:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Get Runs
+        run: |
+          sleep 30s
+          DATE_HOUR=$(date --date='1 minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
+          curl -X GET https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>$DATE_HOUR&event=repository_dispatch&status=success \
+          -H 'Accept: application/vnd.github.everest-preview+json' \
+          -u ${{ secrets.ACCESS_TOKEN }} \
+          -o runs.json
+
+      - name: Set job url
+        id:  job
+        run: echo "::set-output name=url::$(cat runs.json | jq -c '.workflow_runs[0].jobs_url')"  
+
+      - name: Get Jobs
+        run: | 
+          curl -X GET ${{ steps.job.outputs.url }} \
+          -H 'Accept: application/vnd.github.everest-preview+json' \
+          -u ${{ secrets.ACCESS_TOKEN }} \
+          -o jobs.json   
+      
+      - name: Set Id
+        id: api 
+        run: echo "::set-output name=name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-$job_id")')"
