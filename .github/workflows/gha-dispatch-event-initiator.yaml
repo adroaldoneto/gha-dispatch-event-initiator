@@ -1,11 +1,9 @@
 name: Dispatch Event
 
 on:
-  repository_dispatch:
-    types: [success]
   pull_request:
     branches:
-     - release-*
+     - test-*
   
 jobs:
   build:
