@@ -10,12 +10,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      job_id: ${{ steps.build.outputs.job_id }}
     steps:
       - name: Dispatch init event
         if: github.event.action != 'success'
         id: build
         run: |
-          JOB_ID=$(echo $RANDOM | md5sum | head -c 10);
+          JOB_ID=$(echo $RANDOM | md5sum | head -c 10)
           echo "::set-output name=job_id::$JOB_ID" 
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
@@ -29,24 +31,37 @@ jobs:
     steps:
       - name: Get Runs
         run: |
-          sleep 30s
-          DATE_HOUR=$(date --date='1 minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
-          curl -X GET https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>$DATE_HOUR&event=repository_dispatch&status=success \
-          -H 'Accept: application/vnd.github.everest-preview+json' \
+          sleep 16s
+          DATE_TIME=$(date --date='3 minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
+          curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>'"$DATE_TIME"'&event=repository_dispatch&status=success' \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           -o runs.json
 
       - name: Set job url
-        id:  job
-        run: echo "::set-output name=url::$(cat runs.json | jq -c '.workflow_runs[0].jobs_url')"  
+        id:  set_job_url
+        run: |
+          ls
+          echo "::set-output name=url::$(cat runs.json | jq -c '.workflow_runs[0].jobs_url')"  
 
       - name: Get Jobs
         run: | 
-          curl -X GET ${{ steps.job.outputs.url }} \
-          -H 'Accept: application/vnd.github.everest-preview+json' \
+          curl --location --request GET ${{ steps.set_job_url.outputs.url }} \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           -o jobs.json   
       
-      - name: Set Id
-        id: api 
-        run: echo "::set-output name=name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-$job_id")')"
+      - name: Set Job name
+        id: set_job_name 
+        run: |
+          echo "::set-output name=name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-'${{ needs.build.outputs.job_id }}'").name')"
+
+      - name: Success Or Error
+        run: |
+          if [ -n "${{ steps.set_job_name.outputs.name }}" ]; then 
+            echo "Validation success"
+            exit 0; 
+          else
+            echo "Job name not found"
+            exit 1; 
+          fi
