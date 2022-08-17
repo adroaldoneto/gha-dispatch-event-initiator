@@ -27,7 +27,7 @@ runs:
         DATE_TIME=$(date --date=''${{ inputs.MINUTES_AGO }}' minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
         curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/workflows/'${{inputs.WORKFLOW_NAME}}'.yml/runs?created=>'"$DATE_TIME"'&event=repository_dispatch&status=success' \
         --header 'Accept: application/vnd.github.everest-preview+json' \
-        -u ${{ secrets.ACCESS_TOKEN }} \
+        -u ${{ inputs.ACCESS_TOKEN }} \
         -o runs.json
 
     - name: Set job url
@@ -39,7 +39,7 @@ runs:
       run: | 
         curl --location --request GET ${{ steps.job_url.outputs.value }} \
         --header 'Accept: application/vnd.github.everest-preview+json' \
-        -u ${{ secrets.ACCESS_TOKEN }} \
+        -u ${{ inputs.ACCESS_TOKEN }} \
         -o jobs.json   
     
     - name: Set Job name
