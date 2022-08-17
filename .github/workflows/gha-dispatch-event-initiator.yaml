@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      job_id: ${{ steps.job.outputs.job_id }}
+      job_id: ${{ steps.build.outputs.job_id }}
     steps:
       - name: Dispatch init event
         if: github.event.action != 'success'
@@ -19,6 +19,7 @@ jobs:
         run: |
           JOB_ID=$(echo $RANDOM | md5sum | head -c 10)
           echo "::set-output name=job_id::$JOB_ID" 
+          echo $JOB_ID
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
