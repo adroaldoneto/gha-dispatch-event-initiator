@@ -22,6 +22,7 @@ runs:
   using: composite
   steps:
     - name: Get Runs
+      shell: bash
       run: |
         sleep ${{ inputs.DELAY }}
         DATE_TIME=$(date --date=''${{ inputs.MINUTES_AGO }}' minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -31,11 +32,13 @@ runs:
         -o runs.json
 
     - name: Set job url
+      shell: bash
       id:  job_url
       run: |
         echo "::set-output name=value::$(cat runs.json | jq -c '.workflow_runs[0].jobs_url')"  
 
     - name: Get Jobs
+      shell: bash
       run: | 
         curl --location --request GET ${{ steps.job_url.outputs.value }} \
         --header 'Accept: application/vnd.github.everest-preview+json' \
@@ -43,11 +46,13 @@ runs:
         -o jobs.json   
     
     - name: Set Job name
+      shell: bash
       id: job_name 
       run: |
         echo "::set-output name=value::$(cat jobs.json | jq -c '.jobs[] | select(.name == "'${{ inputs.JOB_NAME }}'").name')"
 
     - name: Success Or Error
+      shell: bash
       run: |
         if [ -n "${{ steps.job_name.outputs.value }}" ]; then 
           echo "Validation success"
