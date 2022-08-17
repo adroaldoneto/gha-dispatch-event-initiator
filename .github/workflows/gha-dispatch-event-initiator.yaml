@@ -30,8 +30,8 @@ jobs:
       - name: Get Runs
         run: |
           sleep 16s
-          DATE_HOUR=$(date --date='1 minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
-          curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>'"$DATE_HOUR"'&event=repository_dispatch&status=success' \
+          DATE_TIME=$(date --date='3 minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
+          curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>'"$DATE_TIME"'&event=repository_dispatch&status=success' \
           --header 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           -o runs.json
@@ -49,8 +49,18 @@ jobs:
           -u ${{ secrets.ACCESS_TOKEN }} \
           -o jobs.json   
       
-      - name: Set Id
+      - name: Set Job name
         id: api 
         run: |
-          ls
-          echo "::set-output name=name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-$job_id")')"
+          echo "JOB_ID '${{ steps.job.outputs.job_id }}'"
+          echo "::set-output name=job_name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-'${{ steps.job.outputs.job_id }}'").name')"
+
+      - name: Success Or Error
+        run: |
+          if [ ! -z '"${{ steps.job.outputs.job_name }}"' ]; then 
+            echo "Validation success"
+            exit 0; 
+          else
+            echo "Job name not found"
+            exit 1; 
+          fi
