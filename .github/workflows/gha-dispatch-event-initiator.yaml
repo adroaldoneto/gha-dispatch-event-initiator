@@ -30,22 +30,27 @@ jobs:
       - name: Get Runs
         run: |
           sleep 30s
-          curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>2022-08-16T20:06:35Zevent=repository_dispatch&status=success' \
+          DATE_HOUR=$(date --date='1 minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
+          curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>'"$DATE_HOUR"'&event=repository_dispatch&status=success' \
           --header 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           -o runs.json
 
       - name: Set job url
         id:  job
-        run: echo "::set-output name=url::$(cat runs.json | jq -c '.workflow_runs[0].jobs_url')"  
+        run: |
+          ll -s
+          echo "::set-output name=url::$(cat runs.json | jq -c '.workflow_runs[0].jobs_url')"  
 
       - name: Get Jobs
         run: | 
-          curl -X GET ${{ steps.job.outputs.url }} \
-          -H 'Accept: application/vnd.github.everest-preview+json' \
+          curl --location --request GET ${{ steps.job.outputs.url }} \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           -o jobs.json   
       
       - name: Set Id
         id: api 
-        run: echo "::set-output name=name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-$job_id")')"
+        run: |
+          ll -s
+          echo "::set-output name=name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-$job_id")')"
