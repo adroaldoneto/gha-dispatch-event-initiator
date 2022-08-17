@@ -29,7 +29,7 @@ jobs:
     steps:
       - name: Get Runs
         run: |
-          sleep 30s
+          sleep 15s
           DATE_HOUR=$(date --date='1 minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
           curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>'"$DATE_HOUR"'&event=repository_dispatch&status=success' \
           --header 'Accept: application/vnd.github.everest-preview+json' \
@@ -39,7 +39,7 @@ jobs:
       - name: Set job url
         id:  job
         run: |
-          ll -s
+          ls
           echo "::set-output name=url::$(cat runs.json | jq -c '.workflow_runs[0].jobs_url')"  
 
       - name: Get Jobs
@@ -52,5 +52,5 @@ jobs:
       - name: Set Id
         id: api 
         run: |
-          ll -s
+          ls
           echo "::set-output name=name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-$job_id")')"
