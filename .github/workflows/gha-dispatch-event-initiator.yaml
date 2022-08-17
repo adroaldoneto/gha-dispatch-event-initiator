@@ -30,8 +30,8 @@ jobs:
       - name: Get Runs
         run: |
           sleep 30s
-          curl -X GET https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>2022-08-16T20:06:35Zevent=repository_dispatch&status=success \
-          -H 'Accept: application/vnd.github.everest-preview+json' \
+          curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>2022-08-16T20:06:35Zevent=repository_dispatch&status=success' \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           -o runs.json
 
