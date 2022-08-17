@@ -26,7 +26,7 @@ runs:
       run: |
         sleep ${{ inputs.DELAY }}
         DATE_TIME=$(date --date='${{ inputs.MINUTES_AGO }} minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
-        curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/workflows/${{inputs.WORKFLOW_NAME}}.yml/runs?created=>'"$DATE_TIME"'&event=repository_dispatch&status=success' \
+        curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/workflows/${{inputs.WORKFLOW_NAME}}.yaml/runs?created=>'"$DATE_TIME"'&event=repository_dispatch&status=success' \
         --header 'Accept: application/vnd.github.everest-preview+json' \
         -u ${{ inputs.ACCESS_TOKEN }} \
         -o runs.json
