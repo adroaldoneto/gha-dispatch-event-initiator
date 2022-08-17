@@ -34,7 +34,7 @@ jobs:
         with:
           JOB_NAME: build-${{ needs.build.outputs.job_id }}
           MINUTES_AGO: 3
-          DELAY: 15s
+          DELAY: 17s
           WORKFLOW_NAME: gha-dispatch-event
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         
