@@ -27,11 +27,14 @@ jobs:
     needs:
       - build
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Verify SAST
-        uses: ./github/actions/verify
+        uses: ./.github/actions/verify
         with:
           JOB_NAME: build-${{ needs.build.outputs.job_id }}
           MINUTES_AGO: 3
           DELAY: 15s
           WORKFLOW_NAME: gha-dispatch-event
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         
