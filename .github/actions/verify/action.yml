@@ -54,7 +54,7 @@ runs:
     - name: Success Or Error
       shell: bash
       run: |
-        if [ -n ${{ steps.job_name.outputs.value }} ]; then 
+        if [ -n "${{ steps.job_name.outputs.value }}" ]; then 
           echo "Validation success"
           exit 0; 
         else
