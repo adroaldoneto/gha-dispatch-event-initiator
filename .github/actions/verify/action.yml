@@ -1,0 +1,55 @@
+name: Verify SAST
+description: Verify SAST workflow status   
+
+inputs:
+  JOB_NAME:
+    description: Job name with id to validate uniqueness
+    required: true
+  MINUTES_AGO:
+    description: Minutes ago that you want to search the runs
+    required: true
+  DELAY:
+    description: Wait time to check the workflow status
+    required: true
+  WORKFLOW_NAME:
+    description: Workflow name
+    required: true
+  
+runs:
+  using: composite
+  steps:
+    - name: Get Runs
+      run: |
+        sleep ${{ inputs.DELAY }}
+        DATE_TIME=$(date --date=''${{ inputs.MINUTES_AGO }}' minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
+        curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/workflows/'${{inputs.WORKFLOW_NAME}}'.yml/runs?created=>'"$DATE_TIME"'&event=repository_dispatch&status=success' \
+        --header 'Accept: application/vnd.github.everest-preview+json' \
+        -u ${{ secrets.ACCESS_TOKEN }} \
+        -o runs.json
+
+    - name: Set job url
+      id:  job_url
+      run: |
+        echo "::set-output name=value::$(cat runs.json | jq -c '.workflow_runs[0].jobs_url')"  
+
+    - name: Get Jobs
+      run: | 
+        curl --location --request GET ${{ steps.job_url.outputs.value }} \
+        --header 'Accept: application/vnd.github.everest-preview+json' \
+        -u ${{ secrets.ACCESS_TOKEN }} \
+        -o jobs.json   
+    
+    - name: Set Job name
+      id: job_name 
+      run: |
+        echo "::set-output name=value::$(cat jobs.json | jq -c '.jobs[] | select(.name == "'${{ inputs.JOB_NAME }}'").name')"
+
+    - name: Success Or Error
+      run: |
+        if [ -n "${{ steps.job_name.outputs.value }}" ]; then 
+          echo "Validation success"
+          exit 0; 
+        else
+          echo "Job name not found"
+          exit 1; 
+        fi
