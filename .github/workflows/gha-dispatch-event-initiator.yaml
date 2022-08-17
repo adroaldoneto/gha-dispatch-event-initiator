@@ -10,12 +10,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      job_id: ${{ steps.job.outputs.job_id }}
     steps:
       - name: Dispatch init event
         if: github.event.action != 'success'
         id: build
         run: |
-          echo "::set-output name=job_id::$(echo $RANDOM | md5sum | head -c 10)" 
+          JOB_ID=$(echo $RANDOM | md5sum | head -c 10)
+          echo "::set-output name=job_id::$JOB_ID" 
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
@@ -51,12 +54,12 @@ jobs:
       - name: Set Job name
         id: api 
         run: |
-          echo "JOB_ID '${{ steps.job.outputs.job_id }}'"
-          echo "::set-output name=job_name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-'${{ steps.job.outputs.job_id }}'").name')"
+          echo "JOB_ID '${{ needs.build.outputs.job_id }}'"
+          echo "::set-output name=job_name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-'${{ needs.build.outputs.job_id }}'").name')"
 
       - name: Success Or Error
         run: |
-          if [ ! -z '"${{ steps.job.outputs.job_name }}"' ]; then 
+          if [ ! -n '"${{ needs.build.outputs.job_id }}"' ]; then 
             echo "Validation success"
             exit 0; 
           else
