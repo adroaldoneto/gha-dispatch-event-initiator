@@ -31,7 +31,7 @@ jobs:
         run: |
           sleep 30s
           DATE_HOUR=$(date --date='1 minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
-          curl -X GET https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>$DATE_HOUR&event=repository_dispatch&status=success \
+          curl -X GET https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>${DATE_HOUR}&event=repository_dispatch&status=success \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           -o runs.json
