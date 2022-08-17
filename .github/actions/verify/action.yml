@@ -49,7 +49,7 @@ runs:
       shell: bash
       id: job_name 
       run: |
-        echo "::set-output name=value::$(cat jobs.json | jq -c '.jobs[] | select(.name == "'${{ inputs.JOB_NAME }}'-").name')"
+        echo "::set-output name=value::$(cat jobs.json | jq -c '.jobs[] | select(.name == "'${{ inputs.JOB_NAME }}'").name')"
 
     - name: Success Or Error
       shell: bash
