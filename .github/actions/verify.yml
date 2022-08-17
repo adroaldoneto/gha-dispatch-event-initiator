@@ -1,0 +1,41 @@
+name: Verify
+
+runs:
+  using: composite
+  steps:
+    - name: Get Runs
+      run: |
+        sleep 16s
+        DATE_TIME=$(date --date='3 minutes ago' -u +"%Y-%m-%dT%H:%M:%SZ")
+        curl --location --request GET 'https://api.github.com/repos/adroaldoneto/gha-dispatch-event/actions/runs?created=>'"$DATE_TIME"'&event=repository_dispatch&status=success' \
+        --header 'Accept: application/vnd.github.everest-preview+json' \
+        -u ${{ secrets.ACCESS_TOKEN }} \
+        -o runs.json
+
+    - name: Set job url
+      id:  set_job_url
+      run: |
+        ls
+        echo "::set-output name=url::$(cat runs.json | jq -c '.workflow_runs[0].jobs_url')"  
+
+    - name: Get Jobs
+      run: | 
+        curl --location --request GET ${{ steps.set_job_url.outputs.url }} \
+        --header 'Accept: application/vnd.github.everest-preview+json' \
+        -u ${{ secrets.ACCESS_TOKEN }} \
+        -o jobs.json   
+
+    - name: Set Job name
+      id: set_job_name 
+      run: |
+        echo "::set-output name=name::$(cat jobs.json | jq -c '.jobs[] | select(.name == "build-'${{ needs.build.outputs.job_id }}'").name')"
+
+    - name: Success Or Error
+      run: |
+        if [ -n "${{ steps.set_job_name.outputs.name }}" ]; then 
+          echo "Validation success"
+          exit 0; 
+        else
+          echo "Job name not found"
+          exit 1; 
+        fi
