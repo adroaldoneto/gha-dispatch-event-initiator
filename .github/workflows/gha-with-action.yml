@@ -36,4 +36,5 @@ jobs:
           MINUTES_AGO: 3
           DELAY: 15s
           WORKFLOW_NAME: gha-dispatch-event
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         
