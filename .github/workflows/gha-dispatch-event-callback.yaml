@@ -1,7 +1,9 @@
+name: Verify Test
+
 on: [repository_dispatch]
       
 jobs:
-  WORKFLOW_TEST:
+  VERIFY_TEST:
     name: verify
     runs-on: ubuntu-latest
     if: github.event.action == 'success'
@@ -10,35 +12,35 @@ jobs:
       - run: |
           echo "Event: '${{ github.event }}'"
           
-      - name: Tests ✅
-        if: ${{ success() }}
-        # set the merge commit status check
-        # using GitHub REST API
-        # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
-        run: |
-          curl --request POST \
-          --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
-          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-          --header 'content-type: application/json' \
-          --data '{
-            "context": "Success Test",
-            "state": "success",
-            "description": "tests passed",
-            "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          }'
-      - name: Tests 🚨
-        if: ${{ failure() }}
-        # set the merge commit status check
-        # using GitHub REST API
-        # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
-        run: |
-          curl --request POST \
-          --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
-          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-          --header 'content-type: application/json' \
-          --data '{
-            "context": "Failure Test",
-            "state": "failure",
-            "description": "tests failed",
-            "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          }'
+      # - name: Tests ✅
+      #   if: ${{ success() }}
+      #   # set the merge commit status check
+      #   # using GitHub REST API
+      #   # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
+      #   run: |
+      #     curl --request POST \
+      #     --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+      #     --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+      #     --header 'content-type: application/json' \
+      #     --data '{
+      #       "context": "Success Test",
+      #       "state": "success",
+      #       "description": "tests passed",
+      #       "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      #     }'
+      # - name: Tests 🚨
+      #   if: ${{ failure() }}
+      #   # set the merge commit status check
+      #   # using GitHub REST API
+      #   # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
+      #   run: |
+      #     curl --request POST \
+      #     --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+      #     --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+      #     --header 'content-type: application/json' \
+      #     --data '{
+      #       "context": "Failure Test",
+      #       "state": "failure",
+      #       "description": "tests failed",
+      #       "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      #     }'
