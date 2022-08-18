@@ -1,13 +1,17 @@
+name: Verify Test
+
 on: [repository_dispatch]
-      
+
 jobs:
-  WORKFLOW_TEST:
+
+  VERIFY_TEST:
     name: verify
     runs-on: ubuntu-latest
     if: github.event.action == 'success'
     steps:
       - name: Show Event
-      - run: |
+        id: version
+        run: |
           echo "Event: '${{ github.event }}'"
           
       - name: Tests ✅
