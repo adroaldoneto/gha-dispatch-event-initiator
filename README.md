@@ -1,19 +1,1 @@
 # gha-dispatch-event-initiator
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
