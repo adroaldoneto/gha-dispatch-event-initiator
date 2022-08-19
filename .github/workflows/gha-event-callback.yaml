@@ -1,6 +1,9 @@
 name: Verify Workflow
 
-on: [repository_dispatch]
+on: 
+  repository_dispatch:
+    type:
+      - verify-workflow
 
 jobs:
   VERIFY_WORKFLOW:
