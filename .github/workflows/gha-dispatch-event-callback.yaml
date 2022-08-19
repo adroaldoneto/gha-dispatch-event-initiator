@@ -1,11 +1,12 @@
 name: Verify Test
 
-on: [repository_dispatch]
+on:
+  repository_dispatch:
+    type: [verify-test]
 
 jobs:
 
   VERIFY_TEST:
-    name: verify
     runs-on: ubuntu-latest
     if: github.event.action == 'success'
     steps:
@@ -21,7 +22,7 @@ jobs:
         # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
         run: |
           curl --request POST \
-          --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+          --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.client_payload.sha }} \
           --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
           --header 'content-type: application/json' \
           --data '{
@@ -37,7 +38,7 @@ jobs:
         # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
         run: |
           curl --request POST \
-          --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+          --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.client_payload.sha }} \
           --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
           --header 'content-type: application/json' \
           --data '{
