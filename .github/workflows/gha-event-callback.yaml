@@ -11,7 +11,7 @@ jobs:
     steps:
 
       - name: Verify Callback :warning:
-        if: ${{ github.event.client_payload.state }} == 'pending'
+        if: github.event.client_payload.state == 'pending'
         # set the merge commit status check
         # using GitHub REST API
         # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
@@ -28,7 +28,7 @@ jobs:
           }'
 
       - name: Verify Callback ✅
-        if: ${{ github.event.client_payload.state }} == 'success'
+        if: github.event.client_payload.state == 'success'
         # set the merge commit status check
         # using GitHub REST API
         # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
@@ -45,7 +45,7 @@ jobs:
           }'
 
       - name: Verify Callback 🚨
-        if: ${{ github.event.client_payload.state }} == 'failure'
+        if: github.event.client_payload.state == 'failure'
         # set the merge commit status check
         # using GitHub REST API
         # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
