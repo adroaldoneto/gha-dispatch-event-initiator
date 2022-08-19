@@ -3,7 +3,7 @@ name: Dispatch Event
 on:
   pull_request:
     branches:
-     - release-*
+     - test-*
   
 jobs:
   build:
