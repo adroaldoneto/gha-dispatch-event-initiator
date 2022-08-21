@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Verify Callback
+      - name: Callback
         if: github.event.client_payload.state == 'pending'
         # set the merge commit status check
         # using GitHub REST API
@@ -20,13 +20,13 @@ jobs:
           -u '${{ secrets.ACCESS_TOKEN }}' \
           --header 'content-type: application/vnd.github+json' \
           --data '{
-            "context": "Pending in execution",
+            "context": "Check Security",
             "state": "pending",
             "description": "pending",
             "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }'
 
-      - name: Verify Callback ✅
+      - name: Callback ✅
         if: github.event.client_payload.state == 'success'
         # set the merge commit status check
         # using GitHub REST API
@@ -37,13 +37,13 @@ jobs:
           -u '${{ secrets.ACCESS_TOKEN }}' \
           --header 'content-type: application/vnd.github+json' \
           --data '{
-            "context": "Success in execution",
+            "context": "Check Security",
             "state": "success",
             "description": "passed",
             "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }'
 
-      - name: Verify Callback 🚨
+      - name: Callback 🚨
         if: github.event.client_payload.state == 'failure'
         # set the merge commit status check
         # using GitHub REST API
@@ -54,7 +54,7 @@ jobs:
           -u '${{ secrets.ACCESS_TOKEN }}' \
           --header 'content-type: application/vnd.github+json' \
           --data '{
-            "context": "Execution failure",
+            "context": Verify Callback",
             "state": "failure",
             "description": "failed",
             "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
