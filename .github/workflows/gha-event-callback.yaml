@@ -9,6 +9,8 @@ jobs:
   VERIFY_WORKFLOW:
     runs-on: ubuntu-latest
     steps:
+      - name: show
+        run: echo "State ${{ github.event.client_payload.state }} "
 
       - name: Verify Callback
         if: github.event.client_payload.state == 'pending'
