@@ -17,7 +17,7 @@ jobs:
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
-          --data '{"event_type": "release","client_payload": {"repository": "'"$GITHUB_REPOSITORY"'","ref": "${{ github.ref }}","ref_name": "${{ github.ref_name }}","statuses_href": "${{ github.event.pull_request._links.statuses.href}}","pull_request_event": "${{ toJson(github.event.pull_request) }}","base_ref": "${{ github.base_ref}}"}}'
+          --data '{"event_type": "release","client_payload": {"repository": "'"$GITHUB_REPOSITORY"'","ref": "${{ github.ref }}","ref_name": "${{ github.ref_name }}","statuses_href": "${{ github.event.pull_request._links.statuses.href}}", "base_ref": "${{ github.base_ref}}"}}'
 
   # VERIFY_SAST:
   #   runs-on: ubuntu-latest
