@@ -60,20 +60,20 @@ jobs:
             "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }'
       
-      - name: Callback 🚨
+      - name: Callback Error
         if: ${{ failure() }}
-          # set the merge commit status check
-          # using GitHub REST API
-          # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
-          run: |
-            curl --request POST \
-            --url ${{ github.event.client_payload.statuses_href }} \
-            -u '${{ secrets.ACCESS_TOKEN }}' \
-            --header 'content-type: application/vnd.github+json' \
-            --data '{
-              "context": Check Callback",
-              "state": "error",
-              "description": "Error",
-              "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }'
+        # set the merge commit status check
+        # using GitHub REST API
+        # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
+        run: |
+          curl --request POST \
+          --url ${{ github.event.client_payload.statuses_href }} \
+          -u '${{ secrets.ACCESS_TOKEN }}' \
+          --header 'content-type: application/vnd.github+json' \
+          --data '{
+            "context": Check Callback",
+            "state": "error",
+            "description": "Error",
+            "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }'
       
