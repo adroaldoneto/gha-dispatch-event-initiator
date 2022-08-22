@@ -54,7 +54,7 @@ jobs:
           -u '${{ secrets.ACCESS_TOKEN }}' \
           --header 'content-type: application/vnd.github+json' \
           --data '{
-            "context": Check Callback",
+            "context": "Check Callback",
             "state": "failure",
             "description": "failed",
             "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -71,7 +71,7 @@ jobs:
           -u '${{ secrets.ACCESS_TOKEN }}' \
           --header 'content-type: application/vnd.github+json' \
           --data '{
-            "context": Check Callback",
+            "context": "Check Callback",
             "state": "error",
             "description": "Error",
             "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
