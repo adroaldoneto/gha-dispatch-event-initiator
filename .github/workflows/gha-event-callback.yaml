@@ -24,7 +24,7 @@ jobs:
           }'
       
       - name: Interal error ❌
-        if: ${{ failure() }} && github.event.client_payload.state != 'failure 
+        if: ${{ failure() }}
         run: |
           curl --request POST \
           --url ${{ github.event.client_payload.statuses_href }} \
