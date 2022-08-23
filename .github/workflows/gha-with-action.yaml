@@ -11,6 +11,21 @@ jobs:
     outputs:
       job_id: ${{ steps.build.outputs.job_id }}
     steps:
+
+      - name: Change to pending status
+        run: |
+          curl --request POST \
+          --url ${{ github.event.pull_request._links.statuses.href}} \
+          -u '${{ secrets.ACCESS_TOKEN }}' \
+          --header 'content-type: application/vnd.github+json' \
+          -o result.json \
+          --data '{
+                    "context": "SECURITY - Check callback",
+                    "state": "pending",
+                    "description": "Waiting to start",
+                    "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }'
+
       - name: Dispatch event
         id: build
         run: |
