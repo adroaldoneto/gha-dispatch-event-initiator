@@ -12,6 +12,13 @@ jobs:
       job_id: ${{ steps.build.outputs.job_id }}
     steps:
 
+      - name: Test
+        run: |
+          REF_NAME=${{ github.ref_name }}
+          REPOSITORY_OWNER=${{ github.repository_owner }}
+          REPOSITORY_NAME=${{ github.repository_name }}
+          curl -X GET "http://localhost:8080/test?refname='"$REF_NAME"'&repo='"$REPOSITORY_OWNER"'/'"$REPOSITORY_NAME"'"
+
       - name: Change to pending status
         run: |
           curl --request POST \
