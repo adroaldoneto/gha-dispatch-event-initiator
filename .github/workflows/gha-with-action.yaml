@@ -11,13 +11,36 @@ jobs:
     outputs:
       job_id: ${{ steps.build.outputs.job_id }}
     steps:
+      - name: Test
+        run: |
+          REF_NAME=${{ github.ref_name }}
+          REPOSITORY_OWNER=${{ github.repository_owner }}
+          REPOSITORY_NAME=${{ github.repository_name }}
+          echo "http://localhost:8080/test?refname='"$REF_NAME"'&repo='"$REPOSITORY_OWNER"'/'"$REPOSITORY_NAME"'"
+          echo "http://localhost:8080/test?refname=$REF_NAME&repo=$REPOSITORY_OWNER/$REPOSITORY_NAME"
+          curl -X GET "http://localhost:8080/test?refname='"$REF_NAME"'&repo='"$REPOSITORY_OWNER"'/'"$REPOSITORY_NAME"'"
+
+      - name: Change to pending status
+        run: |
+          curl --request POST \
+          --url ${{ github.event.pull_request._links.statuses.href}} \
+          -u '${{ secrets.ACCESS_TOKEN }}' \
+          --header 'content-type: application/vnd.github+json' \
+          -o result.json \
+          --data '{
+                    "context": "SECURITY - Check callback",
+                    "state": "pending",
+                    "description": "Waiting to start",
+                    "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }'
+
       - name: Dispatch event
         id: build
         run: |
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
-          --data '{"event_type": "release", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "ref_name": "${{ github.ref_name }}" }}'
+          --data '{"event_type": "release","client_payload": {"repository": "'"$GITHUB_REPOSITORY"'","ref": "${{ github.ref }}","ref_name": "${{ github.ref_name }}","statuses_href": "${{ github.event.pull_request._links.statuses.href}}", "base_ref": "${{ github.base_ref}}"}}'
 
   # VERIFY_SAST:
   #   runs-on: ubuntu-latest

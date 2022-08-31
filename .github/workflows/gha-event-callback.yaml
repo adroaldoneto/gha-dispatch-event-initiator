@@ -2,61 +2,41 @@ name: Verify Workflow
 
 on: 
   repository_dispatch:
-    type:
-      - verify-workflow
+    type: [security, release, tag]
 
 jobs:
   VERIFY_WORKFLOW:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Verify Callback
-        if: github.event.client_payload.state == 'pending'
-        # set the merge commit status check
-        # using GitHub REST API
-        # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
+      - name: Callback - ${{ github.event.client_payload.state }}
+        if: contains(fromJson('["pending", "success", "failure"]'), github.event.client_payload.state)
         run: |
-          curl --request POST \
-          --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.client_payload.sha }} \
-          --u '${{ secrets.ACCESS_TOKEN }}' \
-          --header 'content-type: application/vnd.github+json' \
-          --data '{
-            "context": "Pending in execution",
-            "state": "pending",
-            "description": "pending",
-            "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          }'
-
-      - name: Verify Callback ✅
-        if: github.event.client_payload.state == 'success'
-        # set the merge commit status check
-        # using GitHub REST API
-        # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
-        run: |
-          curl --request POST \
-          --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.client_payload.sha }} \
-          --u '${{ secrets.ACCESS_TOKEN }}' \
-          --header 'content-type: application/vnd.github+json' \
-          --data '{
-            "context": "Success in execution",
-            "state": "success",
-            "description": "passed",
-            "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          }'
-
-      - name: Verify Callback 🚨
-        if: github.event.client_payload.state == 'failure'
-        # set the merge commit status check
-        # using GitHub REST API
-        # see https://docs.github.com/en/rest/reference/repos#create-a-commit-status
-        run: |
-          curl --request POST \
-          --url https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.client_payload.sha }} \
+          ::add-mask::curl --request POST \
+          --url ${{ github.event.client_payload.statuses_href }} \
           -u '${{ secrets.ACCESS_TOKEN }}' \
           --header 'content-type: application/vnd.github+json' \
+          -o result.json \
           --data '{
-            "context": "Execution failure",
-            "state": "failure",
-            "description": "failed",
+            "context": "${{ github.event.action }} - Check Callback",
+            "state": "${{ github.event.client_payload.state }}",
+            "description": "${{ github.event.action }} ${{ github.event.client_payload.description }}",
             "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }'
+          
+      
+      - name: Intenal error ❌
+        if: ${{ failure() && github.event.client_payload.state != 'failure'}}
+        run: |
+          ::add-mask::curl --request POST \
+          --url ${{ github.event.client_payload.statuses_href }} \
+          -u '${{ secrets.ACCESS_TOKEN }}' \
+          --header 'content-type: application/vnd.github+json' \
+          -o error.json \
+          --data '{
+            "context": "${{ github.event.action }} - Check Callback",
+            "state": "error",
+            "description": "Internal error",
+            "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }'
+      
