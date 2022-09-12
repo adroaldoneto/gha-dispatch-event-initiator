@@ -1,10 +1,9 @@
 # Changelog
 
 
-## [0.2.0]
+## [v0.2.0]
 <!-- Release notes generated using configuration in .github/release.yaml at gh-cli -->
 
-## What's Changed
 ### Exciting New Features 🎉
 * Update Readme by @adroaldoneto in https://github.com/adroaldoneto/gha-dispatch-event-initiator/pull/63
 ### Other Changes
