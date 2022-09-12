@@ -55,7 +55,9 @@ jobs:
       - name: Upload Release Asset
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
+        run: |
+          ll
+          gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
 
       # Create pull request
       - name: Create Pull Request
