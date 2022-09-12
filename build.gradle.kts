@@ -56,8 +56,9 @@ changelog {
         Regex("""^v((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)${'$'}""")
     headerParserRegex.set(regex)
     header.set(provider { "[v${version.get()}] - ${date()}" })
+    unreleasedTerm.set("Releases")
     version.set(properties("pluginVersion"))
-    keepUnreleasedSection.set(false)
+    itemPrefix.set("*")
     groups.set(emptyList())
 }
 

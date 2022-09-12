@@ -41,6 +41,7 @@ jobs:
           CHANGELOG="${CHANGELOG//'%'/'%25'}"
           CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
           CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          CHANGELOG="${CHANGELOG//$'**Full Changelog**'/'Full Changelog'}"
 
           echo "::set-output name=changelog::$CHANGELOG"
 
