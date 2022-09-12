@@ -6,6 +6,7 @@ on:
   release:
     types: [prereleased, released]
 
+
 jobs:
 
   # Prepare and publish the plugin to the Marketplace repository
@@ -72,11 +73,11 @@ jobs:
           git config user.name "GitHub Action"
 
           git checkout -b $BRANCH
-          git commit -am "Changelog update - $VERSION"
+          git commit -asm "Changelog update - $VERSION"
           git push --set-upstream origin $BRANCH
 
           gh pr create \
             --title "Changelog update - \`$VERSION\`" \
             --body "Current pull request contains patched \`CHANGELOG.md\` file for the \`$VERSION\` version." \
-            --base main \
-            --head $BRANCH
+            --base $BRANCH
+            --label ignore-for-release
