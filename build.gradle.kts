@@ -1,4 +1,4 @@
-import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.changelog.date
 
 fun properties(key: String) = project.findProperty(key).toString()
 
@@ -52,7 +52,12 @@ intellij {
 
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
+    val regex =
+        Regex("""^v((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)${'$'}""")
+    headerParserRegex.set(regex)
+    header.set(provider { "[v${version.get()}] - ${date()}" })
     version.set(properties("pluginVersion"))
+    keepUnreleasedSection.set(false)
     groups.set(emptyList())
 }
 
