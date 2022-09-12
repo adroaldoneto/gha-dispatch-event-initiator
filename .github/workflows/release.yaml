@@ -49,7 +49,6 @@ jobs:
         env:
           CHANGELOG: ${{ steps.properties.outputs.changelog }}
         run: |
-          chmod +x gradlew
           ./gradlew patchChangelog --release-note="$CHANGELOG"
 
       # Upload artifact as a release asset
