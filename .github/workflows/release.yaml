@@ -63,6 +63,13 @@ jobs:
       - EXPORT_PROPERTIES
     runs-on: ubuntu-latest
     steps:
+
+    # Check out current repository
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
     # Update Unreleased section with the current release note
       - name: Patch Changelog
         if: ${{ needs.EXPORT_PROPERTIES.outputs.changelog != '' }}
