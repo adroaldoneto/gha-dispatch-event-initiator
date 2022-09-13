@@ -39,7 +39,7 @@ jobs:
   EXPORT_PROPERTIES:
     runs-on: ubuntu-latest
     outputs:
-      changelog: ${{ steps.properties.output.changelog }}
+      changelog: ${{ steps.properties.outputs.changelog }}
     steps:    
         # Set environment variables
       - name: Export Properties
