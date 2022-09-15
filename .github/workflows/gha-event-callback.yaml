@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - VERIFY_WORKFLOW
-    if: ${{ needs.VERIFY_WORKFLOW.result == 'success' && github.event.action == 'release' }}
+    if: ${{ needs.VERIFY_WORKFLOW.result == 'success' && github.event.action == 'security' }}
     steps:
       - name: Callback - ${{ github.event.client_payload.state }}
         run: |
