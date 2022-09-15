@@ -42,7 +42,7 @@ jobs:
   
   publish:
     runs-on: ubuntu-latest
-    if: ${{ success() && github.event.event_type == 'RELEASED' }}
+    if: ${{ success() && github.event.event_type == 'release' }}
     steps:
       - name: Callback - ${{ github.event.client_payload.state }}
         run: |
