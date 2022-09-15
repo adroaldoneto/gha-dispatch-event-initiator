@@ -14,7 +14,7 @@ jobs:
         if: |
           !contains(fromJson('["pending", "success", "failure"]'), github.event.client_payload.state)
         run: |
-          echo "Invalid event typed"
+          echo "Invalid state"
           exit 1
 
       - name: Callback - ${{ github.event.client_payload.state }}
