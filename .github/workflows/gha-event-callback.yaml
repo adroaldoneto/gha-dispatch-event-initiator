@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - VERIFY_WORKFLOW
-    if: ${{ success() }}
+    if: ${{ success() && github.event.action == 'release' }}
     steps:
       - name: Callback - ${{ github.event.client_payload.state }}
         run: |
