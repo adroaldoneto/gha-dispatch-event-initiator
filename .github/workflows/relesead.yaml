@@ -1,6 +1,7 @@
 on: 
   repository_dispatch:
-    type: [released]
+    type: 
+      - released
 
 jobs:
   prereleased:
