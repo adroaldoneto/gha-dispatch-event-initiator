@@ -1,0 +1,11 @@
+on: 
+  repository_dispatch:
+    type: [security]
+
+jobs:
+  prereleased:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Security - ${{ github.event.client_payload.state }}
+        run: |
+          echo "Security"

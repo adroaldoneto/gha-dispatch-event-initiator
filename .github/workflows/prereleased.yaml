@@ -1,0 +1,11 @@
+on: 
+  repository_dispatch:
+    type: [prereleased]
+
+jobs:
+  prereleased:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prereleased - ${{ github.event.client_payload.state }}
+        run: |
+          echo "Prereleased"
