@@ -1,6 +1,6 @@
 on: 
   repository_dispatch:
-    type: [prereleased]
+    types: [prereleased]
 
 jobs:
   prereleased:

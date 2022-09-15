@@ -1,6 +1,6 @@
 on: 
   repository_dispatch:
-    type: [security]
+    types: [security]
 
 jobs:
   prereleased:

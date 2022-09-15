@@ -1,6 +1,6 @@
 on: 
   repository_dispatch:
-    type: 
+    types: 
       - released
 
 jobs:

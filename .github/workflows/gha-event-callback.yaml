@@ -2,7 +2,7 @@ name: Verify Workflow
 
 on: 
   repository_dispatch:
-    type: [security, release, tag]
+    types: [security, release, tag]
 
 jobs:
   VERIFY_WORKFLOW:
