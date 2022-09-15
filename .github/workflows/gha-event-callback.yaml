@@ -36,7 +36,7 @@ jobs:
         if: |
           failure() && 
           github.event.client_payload.state != 'failure' &&
-          steps.check_event_type.outcome == 'success'
+          steps.check_event_type.outcome == 'skipped'
         run: |
           curl --request POST \
           --url ${{ github.event.client_payload.statuses_href }} \
