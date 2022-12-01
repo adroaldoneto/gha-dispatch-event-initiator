@@ -9,7 +9,7 @@ jobs:
 
   workflow_call:
     name: Workflow Call
-    use: adroaldoneto/gha-dispatch-event-initiator/.github/workflows/workflow-call.yml
+    uses: adroaldoneto/gha-dispatch-event-initiator/.github/workflows/workflow-call.yml
 
   build:
     runs-on: ubuntu-latest
