@@ -2,15 +2,22 @@ name: Verify Workflow
 
 on: 
   repository_dispatch:
-    type: [security, release, tag]
+    types: [security, release, tag]
 
 jobs:
   VERIFY_WORKFLOW:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Check Event Type - ${{ github.event.client_payload.state }}
+        id: check_event_type
+        if: |
+          !contains(fromJson('["pending", "success", "failure"]'), github.event.client_payload.state)
+        run: |
+          echo "Invalid state"
+          exit 1
+
       - name: Callback - ${{ github.event.client_payload.state }}
-        if: contains(fromJson('["pending", "success", "failure"]'), github.event.client_payload.state)
         run: |
           curl --request POST \
           --url ${{ github.event.client_payload.statuses_href }} \
@@ -26,7 +33,10 @@ jobs:
           
       
       - name: Intenal error ❌
-        if: ${{ failure() && github.event.client_payload.state != 'failure'}}
+        if: |
+          failure() && 
+          github.event.client_payload.state != 'failure' &&
+          steps.check_event_type.outcome == 'skipped'
         run: |
           curl --request POST \
           --url ${{ github.event.client_payload.statuses_href }} \
@@ -39,4 +49,15 @@ jobs:
             "description": "Internal error",
             "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           }'
+  
+  publish:
+    runs-on: ubuntu-latest
+    needs:
+      - VERIFY_WORKFLOW
+    if: ${{ needs.VERIFY_WORKFLOW.result == 'success' && github.event.action == 'security' }}
+    steps:
+      - name: Callback - ${{ github.event.client_payload.state }}
+        run: |
+          echo ${{ github.event.event_type }}
+          echo "teste com sucesso"
       
