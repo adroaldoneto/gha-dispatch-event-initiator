@@ -1,0 +1,14 @@
+on:
+  workflow_call:
+    
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static_tests:
+    runs-on: ubuntu-lastest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0

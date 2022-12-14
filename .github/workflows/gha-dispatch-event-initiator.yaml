@@ -6,15 +6,22 @@ on:
      - test-*
   
 jobs:
+
+  workflow_call:
+    name: Workflow Call
+    uses: adroaldoneto/gha-dispatch-event-initiator/.github/workflows/workflow-call.yml
+
   build:
     runs-on: ubuntu-latest
     outputs:
       job_id: ${{ steps.build.outputs.job_id }}
+    if: contains(github.base_ref, 'test-')
     steps:
       - name: Dispatch init event
         if: github.event.action != 'success'
         id: build
         run: |
+          echo "base_ref: ${{ github.base_ref }}"
           JOB_ID=$(echo $RANDOM | md5sum | head -c 10)
           echo "::set-output name=job_id::$JOB_ID" 
           curl -X POST https://api.github.com/repos/adroaldoneto/gha-dispatch-event/dispatches \
