@@ -8,7 +8,9 @@ on:
 jobs:
   one:
     runs-on: ubuntu-latest
-    if: github.event.label.name == 'enhancement'
+    if: github.event.label.name == 'enhancement' || 
+        (contains(fromJson('["opened", "reopened"]'), github.event.action) &&
+        contains(github.event.pull_request.labels.*.name, 'enhancement'))
     steps:
       - name: Dump GitHub context
         env:
