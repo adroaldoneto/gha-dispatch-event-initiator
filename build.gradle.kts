@@ -1,34 +1,44 @@
-import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.changelog.date
 
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     // Java support
     id("java")
-    // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.7.10"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.8.0"
+    id("org.jetbrains.intellij") version "1.9.0"
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "1.3.1"
     // Gradle Qodana Plugin
     id("org.jetbrains.qodana") version "0.1.13"
+
+    id("org.springframework.boot") version "2.7.3"
+    id("io.spring.dependency-management") version "1.0.13.RELEASE"
+    kotlin("jvm") version "1.6.21"
+    kotlin("plugin.spring") version "1.6.21"
 }
 
 group = properties("pluginGroup")
 version = properties("pluginVersion")
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
 
 // Configure project's dependencies
 repositories {
     mavenCentral()
 }
 
-// Set the JVM language level used to compile sources and generate files - Java 11 is required since 2020.3
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
-    }
-}
+//// Set the JVM language level used to compile sources and generate files - Java 11 is required since 2020.3
+//kotlin {
+//    jvmToolchain {
+//        languageVersion.set(JavaLanguageVersion.of(11))
+//    }
+//}
 
 // Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
@@ -42,7 +52,13 @@ intellij {
 
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
+    val regex =
+        Regex("""^v((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)${'$'}""")
+    headerParserRegex.set(regex)
+    header.set(provider { "[v${version.get()}] - ${date()}" })
+    unreleasedTerm.set("Releases")
     version.set(properties("pluginVersion"))
+    itemPrefix.set("*")
     groups.set(emptyList())
 }
 
@@ -89,4 +105,8 @@ tasks {
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
     }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

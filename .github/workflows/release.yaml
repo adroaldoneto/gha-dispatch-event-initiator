@@ -9,7 +9,7 @@ on:
 jobs:
 
   # Prepare and publish the plugin to the Marketplace repository
-  release:
+  PUBLISH:
     name: Publish Plugin
     runs-on: ubuntu-latest
     steps:
@@ -20,19 +20,26 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name }}
 
-      # Setup Java 11 environment for the next steps
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: zulu
-          java-version: 11
 
-      # Set environment variables
+      # Upload artifact as a release asset
+      - name: Upload Release Asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          ./gradlew buildPlugin
+          gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
+
+  EXPORT_PROPERTIES:
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.properties.outputs.changelog }}
+    steps:    
+        # Set environment variables
       - name: Export Properties
         id: properties
         shell: bash
         run: |
-          CHANGELOG="$(cat << 'EOM' | sed -e 's/^[[:space:]]*$//g' -e '/./,$!d'
+          CHANGELOG="$(cat << 'EOM' | sed -e "/## What's Changed/d" -e 's/^[[:space:]]*$//g' -e '/./,$!d'
           ${{ github.event.release.body }}
           EOM
           )"
@@ -40,26 +47,40 @@ jobs:
           CHANGELOG="${CHANGELOG//'%'/'%25'}"
           CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
           CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          CHANGELOG="${CHANGELOG//$'**Full Changelog**'/'Full Changelog'}"
 
           echo "::set-output name=changelog::$CHANGELOG"
 
-      # Update Unreleased section with the current release note
+  CHANGELOG:
+    needs: 
+      - EXPORT_PROPERTIES
+    runs-on: ubuntu-latest
+    steps:
+
+    # Check out current repository
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      # # Setup Java 11 environment for the next steps
+      # - name: Setup Java
+      #   uses: actions/setup-java@v3
+      #   with:
+      #     distribution: zulu
+      #     java-version: 11
+
+    # Update Unreleased section with the current release note
       - name: Patch Changelog
-        if: ${{ steps.properties.outputs.changelog != '' }}
+        if: ${{ needs.EXPORT_PROPERTIES.outputs.changelog != '' }}
         env:
-          CHANGELOG: ${{ steps.properties.outputs.changelog }}
+          CHANGELOG: ${{ needs.EXPORT_PROPERTIES.outputs.changelog }}
         run: |
           ./gradlew patchChangelog --release-note="$CHANGELOG"
 
-      # Upload artifact as a release asset
-      - name: Upload Release Asset
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
-
       # Create pull request
       - name: Create Pull Request
-        if: ${{ steps.properties.outputs.changelog != '' }}
+        if: ${{ needs.EXPORT_PROPERTIES.outputs.changelog != '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
@@ -70,11 +91,12 @@ jobs:
           git config user.name "GitHub Action"
 
           git checkout -b $BRANCH
-          git commit -am "Changelog update - $VERSION"
+          git commit -asm "Changelog update - $VERSION"
           git push --set-upstream origin $BRANCH
 
           gh pr create \
             --title "Changelog update - \`$VERSION\`" \
             --body "Current pull request contains patched \`CHANGELOG.md\` file for the \`$VERSION\` version." \
-            --base main \
-            --head $BRANCH
+            --base "${{ github.event.release.target_commitish }}" \
+            --head $BRANCH \
+            --label ignore-for-release
